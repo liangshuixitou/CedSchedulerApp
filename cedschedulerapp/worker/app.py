@@ -20,7 +20,8 @@ async def send_heartbeat():
             # 发送心跳到master
             async with httpx.AsyncClient() as client:
                 response = await client.post(
-                    f"http://{server_config.master_host}:{server_config.master_port}/node/heartbeat", json=stats
+                    f"http://{server_config.master_host}:{server_config.master_port}/node/heartbeat",
+                    json=stats.model_dump(),
                 )
                 response.raise_for_status()
                 print(f"Heartbeat sent successfully at {datetime.now()}")
