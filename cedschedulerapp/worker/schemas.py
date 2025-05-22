@@ -1,16 +1,8 @@
-from enum import Enum
-from typing import List
 from pydantic import BaseModel
 
-class RegionType(str, Enum):
-    All = '0'
-    Cloud = '1'
-    Edge = '2'
-    Device = '3'
+from cedschedulerapp.worker.enums import NodeType
+from cedschedulerapp.worker.enums import RegionType
 
-class NodeType(str, Enum):
-    Training = '训练'
-    Inference = '推理'
 
 class GPUInfo(BaseModel):
     gpu_id: str
@@ -18,6 +10,7 @@ class GPUInfo(BaseModel):
     gpu_memory_total: int
     gpu_memory_used: int
     gpu_utilization: float
+
 
 class NodeResourceStatsResponse(BaseModel):
     node_id: str
@@ -32,4 +25,4 @@ class NodeResourceStatsResponse(BaseModel):
     used_gpu_count: int
     used_memory_count: int
     used_storage_count: int
-    gpu_info: List[GPUInfo] 
+    gpu_info: list[GPUInfo]

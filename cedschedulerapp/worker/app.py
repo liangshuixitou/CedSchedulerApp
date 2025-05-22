@@ -1,8 +1,12 @@
-from fastapi import FastAPI, HTTPException
-from .types import NodeResourceStatsResponse
-from .service import get_node_stats
+from fastapi import FastAPI
+from fastapi import HTTPException
+
+from cedschedulerapp.worker.args import server_config
+from cedschedulerapp.worker.schemas import NodeResourceStatsResponse
+from cedschedulerapp.worker.service import get_node_stats
 
 app = FastAPI()
+
 
 @app.get("/node/stats", response_model=NodeResourceStatsResponse)
 async def get_node_stats_endpoint():
@@ -11,6 +15,8 @@ async def get_node_stats_endpoint():
     except Exception as err:
         raise HTTPException(status_code=500, detail=str(err)) from err
 
+
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+
+    uvicorn.run(app, host=server_config.host, port=server_config.port, reload=server_config.reload)
