@@ -7,8 +7,8 @@ from cedschedulerapp.worker.enums import RegionType
 
 @dataclass
 class ServerConfig:
-    host: str = "0.0.0.0"
-    port: int = 8000
+    master_host: str = "127.0.0.1"
+    master_port: int = 8000
     reload: bool = False
     node_id: str = "cedscheduler-worker"
     region: str = "Cloud"
@@ -17,8 +17,8 @@ class ServerConfig:
 
 def parse_args() -> ServerConfig:
     parser = argparse.ArgumentParser(description="CedScheduler Worker Server")
-    parser.add_argument("--host", type=str, default="0.0.0.0", help="服务器主机地址 (默认: 0.0.0.0)")
-    parser.add_argument("--port", type=int, default=8000, help="服务器端口号 (默认: 8000)")
+    parser.add_argument("--master-host", type=str, default="127.0.0.1", help="Master主机地址 (默认: 127.0.0.1)")
+    parser.add_argument("--master-port", type=int, default=8000, help="Master端口号 (默认: 8000)")
     parser.add_argument("--reload", action="store_true", help="是否启用热重载 (默认: False)")
     parser.add_argument("--id", type=str, required=True, help="节点ID")
     parser.add_argument(
@@ -38,7 +38,12 @@ def parse_args() -> ServerConfig:
 
     args = parser.parse_args()
     return ServerConfig(
-        host=args.host, port=args.port, reload=args.reload, node_id=args.id, region=args.region, node_type=args.type
+        master_host=args.master_host,
+        master_port=args.master_port,
+        reload=args.reload,
+        node_id=args.id,
+        region=args.region,
+        node_type=args.type,
     )
 
 

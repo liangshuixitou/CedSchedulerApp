@@ -12,7 +12,7 @@ class GPUInfo(BaseModel):
     gpu_utilization: float
 
 
-class NodeResourceStatsResponse(BaseModel):
+class NodeResourceStats(BaseModel):
     node_id: str
     node_ip: str
     region: RegionType

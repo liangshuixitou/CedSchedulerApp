@@ -3,12 +3,12 @@ import psutil
 from cedschedulerapp.worker.args import server_config
 from cedschedulerapp.worker.enums import NodeType
 from cedschedulerapp.worker.enums import RegionType
-from cedschedulerapp.worker.schemas import NodeResourceStatsResponse
+from cedschedulerapp.worker.schemas import NodeResourceStats
 from cedschedulerapp.worker.utils import get_gpu_info
 from cedschedulerapp.worker.utils import get_node_ip
 
 
-def get_node_stats() -> NodeResourceStatsResponse:
+def get_node_stats() -> NodeResourceStats:
     try:
         # Get system information
         cpu_count = psutil.cpu_count(logical=True)
@@ -34,7 +34,7 @@ def get_node_stats() -> NodeResourceStatsResponse:
         # Get node IP
         node_ip = get_node_ip()
 
-        return NodeResourceStatsResponse(
+        return NodeResourceStats(
             node_id=server_config.node_id,
             node_ip=node_ip,
             region=RegionType(server_config.region),
