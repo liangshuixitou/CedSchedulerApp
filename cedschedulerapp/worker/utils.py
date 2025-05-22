@@ -57,7 +57,6 @@ def get_tianshu_gpu_info() -> list[GPUInfo]:
                     "gpu_memory_used": 0,
                     "gpu_utilization": 0,
                 }
-                print(f"Found GPU: {current_gpu}")  # 调试信息
 
             # 匹配显存使用情况，如 "| 0%   28C   P0    59W / 250W   | 257MiB / 32768MiB    | 0%        Default    |"
             mem_match = re.search(
@@ -71,14 +70,12 @@ def get_tianshu_gpu_info() -> list[GPUInfo]:
                     current_gpu["gpu_memory_used"] = used
                     current_gpu["gpu_memory_total"] = total
                     current_gpu["gpu_utilization"] = utilization
-                    print(f"Updated GPU info: {current_gpu}")  # 调试信息
                 except Exception as e:
                     print(f"Error parsing GPU info: {e}")  # 调试信息
 
         if current_gpu:
             gpus.append(current_gpu)
 
-        print(f"Final GPU list: {gpus}")  # 调试信息
 
         # 确保所有必需的字段都存在
         result = [
@@ -91,7 +88,6 @@ def get_tianshu_gpu_info() -> list[GPUInfo]:
             )
             for gpu in gpus
         ]
-        print(f"Created GPUInfo objects: {result}")  # 调试信息
         return result
 
     except Exception as err:
