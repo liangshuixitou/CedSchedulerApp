@@ -1,7 +1,19 @@
+from typing import Generic
+from typing import Optional
+from typing import TypeVar
+
 from pydantic import BaseModel
 
 from cedschedulerapp.master.enums import NodeType
 from cedschedulerapp.master.enums import RegionType
+
+T = TypeVar("T")
+
+
+class APIResponse(BaseModel, Generic[T]):
+    code: int = 0
+    message: str = "success"
+    data: Optional[T] = None
 
 
 class GPUInfo(BaseModel):

@@ -1,38 +1,40 @@
 from fastapi import FastAPI
-from fastapi.responses import JSONResponse
 
 from cedschedulerapp.master.args import server_config
 from cedschedulerapp.master.manager import global_manager
+from cedschedulerapp.master.schemas import APIResponse
 from cedschedulerapp.master.schemas import NodeResourceStats
 from cedschedulerapp.master.schemas import ResourceStats
 
 app = FastAPI()
 
 
-@app.post("/node/heartbeat", response_model=NodeResourceStats)
+@app.post("/node/heartbeat", response_model=APIResponse[NodeResourceStats])
 async def receive_heartbeat(stats: NodeResourceStats):
     """接收来自worker节点的心跳信息"""
     try:
         await global_manager.update_node_stats(stats.node_id, stats)
-        return stats
+        return APIResponse(data=stats)
     except Exception as e:
-        return JSONResponse(status_code=500, content={"error": f"更新节点状态失败: {str(e)}", "success": False})
+        return APIResponse(code=500, message=f"更新节点状态失败: {str(e)}")
 
 
-@app.get("/resources/stats", response_model=ResourceStats)
+@app.get("/resources/stats", response_model=APIResponse[ResourceStats])
 async def get_resource_stats():
     try:
-        return await global_manager.get_resource_stats()
+        stats = await global_manager.get_resource_stats()
+        return APIResponse(data=stats)
     except Exception as e:
-        return JSONResponse(status_code=500, content={"error": f"获取资源统计失败: {str(e)}", "success": False})
+        return APIResponse(code=500, message=f"获取资源统计失败: {str(e)}")
 
 
-@app.get("/resources/nodes_stats", response_model=list[NodeResourceStats])
+@app.get("/resources/nodes_stats", response_model=APIResponse[list[NodeResourceStats]])
 async def get_nodes_stats():
     try:
-        return await global_manager.get_all_node_stats()
+        stats = await global_manager.get_all_node_stats()
+        return APIResponse(data=stats)
     except Exception as e:
-        return JSONResponse(status_code=500, content={"error": f"获取所有节点状态失败: {str(e)}", "success": False})
+        return APIResponse(code=500, message=f"获取所有节点状态失败: {str(e)}")
 
 
 if __name__ == "__main__":
