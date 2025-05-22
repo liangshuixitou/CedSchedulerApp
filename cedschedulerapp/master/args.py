@@ -15,7 +15,7 @@ def parse_args() -> ServerConfig:
     parser.add_argument("--port", type=int, default=8000, help="服务器端口号 (默认: 8000)")
 
     args = parser.parse_args()
-    return ServerConfig(host=args.host, port=args.port, reload=args.reload)
+    return ServerConfig(host=args.host, port=args.port, reload=False)
 
 
 server_config = parse_args()
