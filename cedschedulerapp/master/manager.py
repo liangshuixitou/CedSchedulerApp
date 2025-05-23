@@ -90,9 +90,9 @@ class Manager:
         training_task_wrap_runtime_list = await self.training_client.list_tasks()
         self.logger.info(training_task_wrap_runtime_list)
         training_task_list = []
-        for task_id, task_info in training_task_wrap_runtime_list.items():
+        for task_info in training_task_wrap_runtime_list:
             task_detail = TrainingTaskDetail(
-                task_id=task_id,
+                task_id=task_info.get("task_id", ""),
                 task_name=task_info.get("task_name", ""),
                 task_inst_num=task_info.get("task_inst_num", 0),
                 task_plan_cpu=task_info.get("task_plan_cpu", 0.0),
