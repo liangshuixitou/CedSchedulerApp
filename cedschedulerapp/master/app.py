@@ -8,7 +8,7 @@ from cedschedulerapp.master.schemas import NodeResourceStats
 from cedschedulerapp.master.schemas import ResourceStats
 from cedschedulerapp.master.schemas import SubmitTaskRequest
 from cedschedulerapp.master.schemas import TaskLogResponse
-from cedschedulerapp.master.schemas import TrainingTask
+from cedschedulerapp.master.schemas import TrainingTaskDetail
 from cedschedulerapp.utils.logger import setup_logger
 
 app = FastAPI()
@@ -46,7 +46,7 @@ async def get_nodes_stats(region: RegionType):
         return APIResponse(code=500, message=f"获取所有节点状态失败: {str(e)}")
 
 
-@app.get("/training/task_list", response_model=APIResponse[list[TrainingTask]])
+@app.get("/training/task_list", response_model=APIResponse[list[TrainingTaskDetail]])
 async def get_training_task_list():
     try:
         stats = await global_manager.get_training_task_list()

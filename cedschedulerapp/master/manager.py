@@ -86,7 +86,7 @@ class Manager:
                 inference_services=self.inference_services,
             )
 
-    async def get_training_task_list(self) -> list[TrainingTaskDetail]:
+    async def get_training_task_list(self) -> list[TrainingTask]:
         training_task_wrap_runtime_list = await self.training_client.list_tasks()
         self.logger.info(training_task_wrap_runtime_list)
         training_task_list = []
@@ -105,7 +105,7 @@ class Manager:
                 task_start_time=task_info.get("task_start_time", 0.0),
                 task_end_time=task_info.get("task_end_time", 0.0),
             )
-            training_task_list.append(task_detail)
+            training_task_list.append(TrainingTask.from_training_task_detail(task_detail))
         self.training_tasks = training_task_list
         return training_task_list
 
