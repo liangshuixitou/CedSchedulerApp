@@ -12,7 +12,7 @@ T = TypeVar("T")
 
 
 class APIResponse(BaseModel, Generic[T]):
-    code: int = 0
+    code: int = 200
     message: str = "success"
     data: Optional[T] = None
 
