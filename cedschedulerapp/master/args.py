@@ -18,7 +18,9 @@ def parse_args() -> ServerConfig:
     parser.add_argument("--training-port", type=int, default=5000, help="训练服务器端口号 (默认: 5000)")
 
     args = parser.parse_args()
-    return ServerConfig(host=args.host, port=args.port)
+    return ServerConfig(
+        host=args.host, port=args.port, training_host=args.training_host, training_port=args.training_port
+    )
 
 
 server_config = parse_args()

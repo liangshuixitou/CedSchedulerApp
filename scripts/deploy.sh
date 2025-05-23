@@ -7,3 +7,10 @@ conda activate cedschedulerapp && \
 cd /root/project/CedSchedulerApp/cedschedulerapp/worker && \
 python app.py --master-host 10.31.12.19 --master-port 12002 --region 1 --type 训练 --id training-node-1 
 
+conda activate cedschedulerapp && \
+cd /root/project/CedSchedulerApp/cedschedulerapp/worker && \
+python app.py --master-host 10.31.12.19 --master-port 12002 --region 2 --type 训练 --id training-node-2 
+
+conda activate cedschedulerapp && \
+cd /root/project/CedSchedulerApp/cedschedulerapp/worker && \
+python app.py --master-host 10.31.12.19 --master-port 12002 --region 3 --type 训练 --id training-node-3
