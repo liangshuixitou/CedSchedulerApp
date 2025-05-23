@@ -11,7 +11,7 @@ class TaskInst(BaseModel):
     inst_status: TaskStatus
 
 
-class TaskMeta:
+class TaskMeta(BaseModel):
     # task metadata
     task_id: str
     task_name: str
@@ -31,6 +31,8 @@ class ScheduleInfo(BaseModel):
 
 
 class TaskWrapRuntimeInfo(BaseModel):
+    model_config = {"arbitrary_types_allowed": True}
+
     task_meta: TaskMeta
     schedule_infos: dict[int, ScheduleInfo]
     inst_status: dict[int, TaskInstStatus]
