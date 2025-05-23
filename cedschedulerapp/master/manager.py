@@ -1,10 +1,25 @@
+import asyncio
+import random
+import string
+import time
 from asyncio import Lock
+from datetime import datetime
 
+from cedschedulerapp.master.args import server_config
+from cedschedulerapp.master.client.training_client import TraingingServerClient
+from cedschedulerapp.master.client.types import TaskMeta
+from cedschedulerapp.master.enums import GPUPerformance
+from cedschedulerapp.master.enums import GPUType
 from cedschedulerapp.master.enums import RegionType
+from cedschedulerapp.master.enums import TaskStatus
 from cedschedulerapp.master.schemas import InferenceService
 from cedschedulerapp.master.schemas import NodeResourceStats
 from cedschedulerapp.master.schemas import ResourceStats
+from cedschedulerapp.master.schemas import SubmitTaskRequest
+from cedschedulerapp.master.schemas import TaskLogResponse
 from cedschedulerapp.master.schemas import TrainingTask
+from cedschedulerapp.master.schemas import TrainingTaskDetail
+from cedschedulerapp.utils.logger import setup_logger
 
 
 class Manager:
@@ -12,8 +27,21 @@ class Manager:
         self.node_stats: dict[str, NodeResourceStats] = {}
         self.node_stats_lock = Lock()
 
-        self.training_tasks: list[TrainingTask] = []
+        self.training_tasks: list[TrainingTaskDetail] = []
         self.inference_services: list[InferenceService] = []
+        self.training_client = TraingingServerClient(
+            ip=server_config.training_server_ip, port=server_config.training_server_port
+        )
+        self.logger = setup_logger(__name__)
+        self.get_training_task_list_daemon()
+
+    def get_training_task_list_daemon(self):
+        async def _daemon():
+            while True:
+                await self.get_training_task_list()
+                await asyncio.sleep(5)
+
+        asyncio.create_task(_daemon())
 
     async def update_node_stats(self, node_id: str, node_stats: NodeResourceStats):
         async with self.node_stats_lock:
@@ -30,9 +58,9 @@ class Manager:
     async def get_resource_stats(self) -> ResourceStats:
         async with self.node_stats_lock:
             return ResourceStats(
-                cloud_node_count=sum(1 for node in self.node_stats.values() if node.region == RegionType.CLOUD),
-                edge_node_count=sum(1 for node in self.node_stats.values() if node.region == RegionType.EDGE),
-                device_node_count=sum(1 for node in self.node_stats.values() if node.region == RegionType.DEVICE),
+                cloud_node_count=sum(1 for node in self.node_stats.values() if node.region == RegionType.Cloud),
+                edge_node_count=sum(1 for node in self.node_stats.values() if node.region == RegionType.Edge),
+                device_node_count=sum(1 for node in self.node_stats.values() if node.region == RegionType.Device),
                 total_cpu_count=sum(node.cpu_count for node in self.node_stats.values()),
                 used_cpu_count=sum(node.used_cpu_count for node in self.node_stats.values()),
                 total_gpu_count=sum(node.gpu_count for node in self.node_stats.values()),
@@ -43,9 +71,52 @@ class Manager:
                 used_storage_count=sum(node.used_storage_count for node in self.node_stats.values()),
                 training_task_count=len(self.training_tasks),
                 inference_service_count=len(self.inference_services),
-                training_tasks=self.training_tasks,
+                training_tasks=[TrainingTask.from_training_task_detail(task) for task in self.training_tasks],
                 inference_services=self.inference_services,
             )
+
+    async def get_training_task_list(self) -> list[TrainingTaskDetail]:
+        training_task_wrap_runtime_list = await self.training_client.get_training_task_list()
+        training_task_list = [
+            TrainingTaskDetail.from_training_task_wrap_runtime_info(task) for task in training_task_wrap_runtime_list
+        ]
+        self.training_tasks = training_task_list
+        return training_task_list
+
+    async def submit_task(self, request: list[SubmitTaskRequest]):
+        for task_request in request:
+            # Generate random string (4 characters)
+            random_str = "".join(random.choices(string.ascii_lowercase + string.digits, k=4))
+
+            # Convert SubmitTaskRequest to TaskMeta
+            task_meta = TaskMeta(
+                task_id=f"{datetime.now().strftime('%Y%m%d%H%M%S')}_{random_str}",
+                task_name=task_request.task_name,
+                task_inst_num=task_request.inst_num,
+                task_plan_cpu=float(task_request.plan_cpu),
+                task_plan_mem=float(task_request.plan_mem),
+                task_plan_gpu=task_request.plan_gpu,
+                task_status=TaskStatus.Submitted,
+                task_start_time=time.time(),
+                task_runtime={
+                    GPUType.V100: task_request.runtime
+                    * GPUPerformance.T4_PERFORMANCE
+                    / GPUPerformance.V100_PERFORMANCE,
+                    GPUType.P100: task_request.runtime
+                    * GPUPerformance.T4_PERFORMANCE
+                    / GPUPerformance.P100_PERFORMANCE,
+                    GPUType.T4: task_request.runtime,
+                },
+            )
+
+            # Submit task using training client
+            await self.training_client.submit_task(task_meta)
+
+            # Wait for 3 seconds before submitting next task
+            await asyncio.sleep(3)
+
+    async def get_training_task_log(self, task_id: str) -> TaskLogResponse:
+        return await self.training_client.get_training_task_log(task_id)
 
 
 global_manager: Manager = Manager()

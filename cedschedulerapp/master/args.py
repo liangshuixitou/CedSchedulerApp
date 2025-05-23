@@ -6,7 +6,8 @@ from dataclasses import dataclass
 class ServerConfig:
     host: str = "0.0.0.0"
     port: int = 8000
-    reload: bool = False
+    training_host: str = "127.0.0.1"
+    training_port: int = 5000
 
 
 def parse_args() -> ServerConfig:
@@ -15,7 +16,7 @@ def parse_args() -> ServerConfig:
     parser.add_argument("--port", type=int, default=8000, help="服务器端口号 (默认: 8000)")
 
     args = parser.parse_args()
-    return ServerConfig(host=args.host, port=args.port, reload=False)
+    return ServerConfig(host=args.host, port=args.port)
 
 
 server_config = parse_args()
