@@ -33,7 +33,7 @@ async def get_resource_stats():
 
 
 @app.get("/resources/nodes_stats", response_model=APIResponse[list[NodeResourceStats]])
-async def get_nodes_stats(region: RegionType | None = None):
+async def get_nodes_stats(region: RegionType):
     try:
         if region == RegionType.ALL:
             stats = await global_manager.get_all_node_stats()
