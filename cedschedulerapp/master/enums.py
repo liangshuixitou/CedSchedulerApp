@@ -1,10 +1,11 @@
 from enum import Enum
 
 
-class RegionType(str, Enum):
-    Cloud = "1"
-    Edge = "2"
-    Device = "3"
+class RegionType(int, Enum):
+    ALL = 0
+    Cloud = 1
+    Edge = 2
+    Device = 3
 
 
 class NodeType(str, Enum):

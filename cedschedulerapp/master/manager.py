@@ -62,6 +62,10 @@ class Manager:
         async with self.node_stats_lock:
             return list(self.node_stats.values())
 
+    async def get_nodes_stats_by_region(self, region: RegionType) -> list[NodeResourceStats]:
+        async with self.node_stats_lock:
+            return [node for node in self.node_stats.values() if node.region == region]
+
     async def get_resource_stats(self) -> ResourceStats:
         async with self.node_stats_lock:
             return ResourceStats(

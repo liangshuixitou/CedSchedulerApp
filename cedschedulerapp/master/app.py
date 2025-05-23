@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 
 from cedschedulerapp.master.args import server_config
+from cedschedulerapp.master.enums import RegionType
 from cedschedulerapp.master.manager import global_manager
 from cedschedulerapp.master.schemas import APIResponse
 from cedschedulerapp.master.schemas import NodeResourceStats
@@ -32,9 +33,12 @@ async def get_resource_stats():
 
 
 @app.get("/resources/nodes_stats", response_model=APIResponse[list[NodeResourceStats]])
-async def get_nodes_stats():
+async def get_nodes_stats(region: RegionType | None = None):
     try:
-        stats = await global_manager.get_all_node_stats()
+        if region == RegionType.ALL:
+            stats = await global_manager.get_all_node_stats()
+        else:
+            stats = await global_manager.get_nodes_stats_by_region(region)
         return APIResponse(data=stats)
     except Exception as e:
         return APIResponse(code=500, message=f"获取所有节点状态失败: {str(e)}")
