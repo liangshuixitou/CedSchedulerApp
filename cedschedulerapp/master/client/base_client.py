@@ -1,5 +1,3 @@
-from abc import ABC
-from abc import abstractmethod
 from typing import Optional
 
 import requests
@@ -7,12 +5,11 @@ import requests
 from cedschedulerapp.utils.logger import setup_logger
 
 
-class ClientBase(ABC):
+class ClientBase:
     def __init__(self, ip: str, port: int):
         self.base_url = f"http://{ip}:{port}"
         self.logger = setup_logger(__name__)
 
-    @abstractmethod
     async def _make_request(self, endpoint: str, data: dict) -> Optional[dict]:
         """
         发送HTTP请求到服务器
