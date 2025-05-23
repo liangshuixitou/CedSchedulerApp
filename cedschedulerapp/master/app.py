@@ -9,8 +9,10 @@ from cedschedulerapp.master.schemas import ResourceStats
 from cedschedulerapp.master.schemas import SubmitTaskRequest
 from cedschedulerapp.master.schemas import TaskLogResponse
 from cedschedulerapp.master.schemas import TrainingTask
+from cedschedulerapp.utils.logger import setup_logger
 
 app = FastAPI()
+logger = setup_logger(__name__)
 
 
 @app.post("/node/heartbeat", response_model=APIResponse[NodeResourceStats])
@@ -58,6 +60,7 @@ async def submit_task(request: list[SubmitTaskRequest]):
     """提交任务到调度系统"""
     try:
         await global_manager.submit_task(request)
+        logger.info(request)
         return APIResponse()
     except Exception as e:
         return APIResponse(code=500, message=f"任务提交失败: {str(e)}")

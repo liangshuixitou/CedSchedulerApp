@@ -120,6 +120,7 @@ class Manager:
                 },
             )
 
+            self.logger.info(task_meta)
             # Submit task using training client
             await self.training_client.submit_task(task_meta)
 
