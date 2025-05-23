@@ -76,7 +76,7 @@ class TrainingTaskDetail(BaseModel):
 class TrainingTask(BaseModel):
     id: str
     name: str
-    start_time: str
+    start_time: float
 
     @classmethod
     def from_training_task_detail(cls, task: TrainingTaskDetail):
