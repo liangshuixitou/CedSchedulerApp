@@ -2,10 +2,12 @@ from fastapi import FastAPI
 
 from cedschedulerapp.master.args import server_config
 from cedschedulerapp.master.manager import global_manager
-from cedschedulerapp.master.schemas import APIResponse, TaskLogResponse, TrainingTask
+from cedschedulerapp.master.schemas import APIResponse
 from cedschedulerapp.master.schemas import NodeResourceStats
 from cedschedulerapp.master.schemas import ResourceStats
 from cedschedulerapp.master.schemas import SubmitTaskRequest
+from cedschedulerapp.master.schemas import TaskLogResponse
+from cedschedulerapp.master.schemas import TrainingTask
 
 app = FastAPI()
 

@@ -29,9 +29,7 @@ class Manager:
 
         self.training_tasks: list[TrainingTaskDetail] = []
         self.inference_services: list[InferenceService] = []
-        self.training_client = TraingingServerClient(
-            ip=server_config.training_server_ip, port=server_config.training_server_port
-        )
+        self.training_client = TraingingServerClient(ip=server_config.training_host, port=server_config.training_port)
         self.logger = setup_logger(__name__)
         self.get_training_task_list_daemon()
 
