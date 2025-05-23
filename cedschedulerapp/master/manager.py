@@ -87,7 +87,7 @@ class Manager:
             )
 
     async def get_training_task_list(self) -> list[TrainingTaskDetail]:
-        training_task_wrap_runtime_list = await self.training_client.get_training_task_list()
+        training_task_wrap_runtime_list = await self.training_client.list_tasks()
         self.logger.info(training_task_wrap_runtime_list)
         training_task_list = [
             TrainingTaskDetail.from_training_task_wrap_runtime_info(task) for task in training_task_wrap_runtime_list
