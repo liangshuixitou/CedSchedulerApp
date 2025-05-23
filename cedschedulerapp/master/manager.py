@@ -156,7 +156,9 @@ class Manager:
             await asyncio.sleep(3)
 
     async def get_training_task_log(self, task_id: str) -> TaskLogResponse:
-        return await self.training_client.get_training_task_log(task_id)
+        task_log = await self.training_client.get_training_task_log(task_id)
+        self.logger.info(task_log)
+        return TaskLogResponse(task_id=task_id, logs=task_log)
 
 
 global_manager: Manager = Manager()
