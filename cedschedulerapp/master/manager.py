@@ -89,9 +89,23 @@ class Manager:
     async def get_training_task_list(self) -> list[TrainingTaskDetail]:
         training_task_wrap_runtime_list = await self.training_client.list_tasks()
         self.logger.info(training_task_wrap_runtime_list)
-        training_task_list = [
-            TrainingTaskDetail.from_training_task_wrap_runtime_info(task) for task in training_task_wrap_runtime_list
-        ]
+        training_task_list = []
+        for task_id, task_info in training_task_wrap_runtime_list.items():
+            task_detail = TrainingTaskDetail(
+                task_id=task_id,
+                task_name=task_info.get("task_name", ""),
+                task_inst_num=task_info.get("task_inst_num", 0),
+                task_plan_cpu=task_info.get("task_plan_cpu", 0.0),
+                task_plan_mem=task_info.get("task_plan_mem", 0.0),
+                task_plan_gpu=task_info.get("task_plan_gpu", 0),
+                task_status=task_info.get("task_status", TaskStatus.Submitted),
+                schedule_infos=task_info.get("schedule_infos", {}),
+                inst_status=task_info.get("inst_status", {}),
+                task_submit_time=task_info.get("task_submit_time", 0.0),
+                task_start_time=task_info.get("task_start_time", 0.0),
+                task_end_time=task_info.get("task_end_time", 0.0),
+            )
+            training_task_list.append(task_detail)
         self.training_tasks = training_task_list
         return training_task_list
 
@@ -111,13 +125,13 @@ class Manager:
                 task_status=TaskStatus.Submitted,
                 task_start_time=time.time(),
                 task_runtime={
-                    GPUType.V100: task_request.runtime
-                    * GPUPerformance.T4_PERFORMANCE
-                    / GPUPerformance.V100_PERFORMANCE,
-                    GPUType.P100: task_request.runtime
-                    * GPUPerformance.T4_PERFORMANCE
-                    / GPUPerformance.P100_PERFORMANCE,
-                    GPUType.T4: task_request.runtime,
+                    GPUType.V100: int(
+                        task_request.runtime * GPUPerformance.T4_PERFORMANCE / GPUPerformance.V100_PERFORMANCE
+                    ),
+                    GPUType.P100: int(
+                        task_request.runtime * GPUPerformance.T4_PERFORMANCE / GPUPerformance.P100_PERFORMANCE
+                    ),
+                    GPUType.T4: int(task_request.runtime),
                 },
             )
 

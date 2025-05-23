@@ -21,7 +21,7 @@ class TaskMeta(BaseModel):
     task_plan_gpu: int
     task_status: TaskStatus
     task_start_time: float
-    task_runtime: dict[str, float]
+    task_runtime: dict[str, int]
 
 
 class ScheduleInfo(BaseModel):
