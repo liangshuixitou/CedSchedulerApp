@@ -19,6 +19,7 @@ from cedschedulerapp.master.schemas import SubmitTaskRequest
 from cedschedulerapp.master.schemas import TaskLogResponse
 from cedschedulerapp.master.schemas import TrainingTask
 from cedschedulerapp.master.schemas import TrainingTaskDetail
+from cedschedulerapp.master.schemas import TaskWrapRuntimeInfo
 from cedschedulerapp.utils.logger import setup_logger
 
 
@@ -91,19 +92,31 @@ class Manager:
         self.logger.info(training_task_wrap_runtime_list)
         training_task_list = []
         for task_info in training_task_wrap_runtime_list:
-            task_detail = TrainingTaskDetail(
-                task_id=task_info.get("task_id", ""),
-                task_name=task_info.get("task_name", ""),
-                task_inst_num=task_info.get("task_inst_num", 0),
-                task_plan_cpu=task_info.get("task_plan_cpu", 0.0),
-                task_plan_mem=task_info.get("task_plan_mem", 0.0),
-                task_plan_gpu=task_info.get("task_plan_gpu", 0),
-                task_status=task_info.get("task_status", TaskStatus.Submitted),
+            task_meta = TaskMeta(**task_info.get("task_meta", {}))
+
+            task_wrap = TaskWrapRuntimeInfo(
+                task_meta=task_meta,
                 schedule_infos=task_info.get("schedule_infos", {}),
                 inst_status=task_info.get("inst_status", {}),
+                inst_data_status=task_info.get("inst_data_status", {}),
                 task_submit_time=task_info.get("task_submit_time", 0.0),
                 task_start_time=task_info.get("task_start_time", 0.0),
                 task_end_time=task_info.get("task_end_time", 0.0),
+            )
+
+            task_detail = TrainingTaskDetail(
+                task_id=task_meta.task_id,
+                task_name=task_meta.task_name,
+                task_inst_num=task_meta.task_inst_num,
+                task_plan_cpu=task_meta.task_plan_cpu,
+                task_plan_mem=task_meta.task_plan_mem,
+                task_plan_gpu=task_meta.task_plan_gpu,
+                task_status=task_meta.task_status,
+                schedule_infos=task_wrap.schedule_infos,
+                inst_status=task_wrap.inst_status,
+                task_submit_time=task_wrap.task_submit_time,
+                task_start_time=task_wrap.task_start_time,
+                task_end_time=task_wrap.task_end_time,
             )
             training_task_list.append(task_detail)
         self.training_tasks = training_task_list
