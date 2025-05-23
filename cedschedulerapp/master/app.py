@@ -65,7 +65,7 @@ async def submit_task(request: list[SubmitTaskRequest]):
         return APIResponse(code=500, message=f"任务提交失败: {str(e)}")
 
 
-@app.post("/training/task_log/{task_id}", response_model=APIResponse[TaskLogResponse])
+@app.get("/training/task_log/{task_id}", response_model=APIResponse[TaskLogResponse])
 async def update_task(task_id: str):
     """更新训练任务状态"""
     try:

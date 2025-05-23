@@ -17,9 +17,9 @@ from cedschedulerapp.master.schemas import NodeResourceStats
 from cedschedulerapp.master.schemas import ResourceStats
 from cedschedulerapp.master.schemas import SubmitTaskRequest
 from cedschedulerapp.master.schemas import TaskLogResponse
+from cedschedulerapp.master.schemas import TaskWrapRuntimeInfo
 from cedschedulerapp.master.schemas import TrainingTask
 from cedschedulerapp.master.schemas import TrainingTaskDetail
-from cedschedulerapp.master.schemas import TaskWrapRuntimeInfo
 from cedschedulerapp.utils.logger import setup_logger
 
 
