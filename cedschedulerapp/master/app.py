@@ -32,7 +32,7 @@ async def get_resource_stats():
         return APIResponse(code=500, message=f"获取资源统计失败: {str(e)}")
 
 
-@app.get("/resources/nodes_stats", response_model=APIResponse[list[NodeResourceStats]])
+@app.get("/resources/node_stats", response_model=APIResponse[list[NodeResourceStats]])
 async def get_nodes_stats(region: RegionType):
     try:
         if region == RegionType.ALL:
