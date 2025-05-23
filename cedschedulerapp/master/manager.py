@@ -36,10 +36,19 @@ class Manager:
     def get_training_task_list_daemon(self):
         async def _daemon():
             while True:
-                await self.get_training_task_list()
+                try:
+                    await self.get_training_task_list()
+                except Exception as e:
+                    self.logger.error(f"Error in training task list daemon: {e}")
                 await asyncio.sleep(5)
 
-        asyncio.create_task(_daemon())
+        try:
+            loop = asyncio.get_event_loop()
+        except RuntimeError:
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+
+        loop.create_task(_daemon())
 
     async def update_node_stats(self, node_id: str, node_stats: NodeResourceStats):
         async with self.node_stats_lock:
