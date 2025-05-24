@@ -4,7 +4,7 @@ from typing import TypeVar
 
 from pydantic import BaseModel
 
-from cedschedulerapp.master.client.types import ScheduleInfo, TaskWrapRuntimeInfo
+from cedschedulerapp.master.client.types import InferenceInstanceInfo, ScheduleInfo, TaskWrapRuntimeInfo
 from cedschedulerapp.master.enums import NodeType, TaskInstStatus, TaskStatus
 from cedschedulerapp.master.enums import RegionType
 
@@ -76,21 +76,33 @@ class TrainingTaskDetail(BaseModel):
 class TrainingTask(BaseModel):
     id: str
     name: str
-    start_time: float
+    duration: float
+    status: TaskStatus
 
     @classmethod
     def from_training_task_detail(cls, task: TrainingTaskDetail):
         return cls(
             id=task.task_id,
             name=task.task_name,
-            start_time=task.task_start_time,
+            duration=task.task_end_time - task.task_start_time,
+            status=task.task_status,
         )
 
 
 class InferenceService(BaseModel):
-    id: str
-    name: str
-    start_time: str
+    instance_id: str
+    gpu_count: int
+    block_count: int
+    used_block_count: int
+
+    @classmethod
+    def from_inference_instance_info(cls, instance: InferenceInstanceInfo):
+        return cls(
+            instance_id=instance.instance_id,
+            gpu_count=instance.gpu_count,
+            block_count=instance.block_count,
+            used_block_count=instance.used_block_count,
+        )
 
 
 class ResourceStats(BaseModel):
@@ -125,3 +137,7 @@ class SubmitTaskRequest(BaseModel):
 class TaskLogResponse(BaseModel):
     task_id: str
     logs: dict[int, str]
+
+
+class RequestSubmitRequest(BaseModel):
+    message: str

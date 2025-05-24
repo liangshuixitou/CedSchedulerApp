@@ -6,7 +6,9 @@ from asyncio import Lock
 from datetime import datetime
 
 from cedschedulerapp.master.args import server_config
+from cedschedulerapp.master.client.inference_client import InferenceServerClient
 from cedschedulerapp.master.client.training_client import TraingingServerClient
+from cedschedulerapp.master.client.types import InferenceInstanceInfo
 from cedschedulerapp.master.client.types import TaskMeta
 from cedschedulerapp.master.enums import GPUPerformance
 from cedschedulerapp.master.enums import GPUType
@@ -29,8 +31,11 @@ class Manager:
         self.node_stats_lock = Lock()
 
         self.training_tasks: list[TrainingTaskDetail] = []
-        self.inference_services: list[InferenceService] = []
+        self.inference_services: list[InferenceInstanceInfo] = []
         self.training_client = TraingingServerClient(ip=server_config.training_host, port=server_config.training_port)
+        self.inference_client = InferenceServerClient(
+            ip=server_config.inference_host, port=server_config.inference_port
+        )
         self.logger = setup_logger(__name__)
         self.get_training_task_list_daemon()
 
@@ -84,7 +89,9 @@ class Manager:
                 training_task_count=len(self.training_tasks),
                 inference_service_count=len(self.inference_services),
                 training_tasks=[TrainingTask.from_training_task_detail(task) for task in self.training_tasks],
-                inference_services=self.inference_services,
+                inference_services=[
+                    InferenceService.from_inference_instance_info(instance) for instance in self.inference_services
+                ],
             )
 
     async def get_training_task_list(self) -> list[TrainingTaskDetail]:
@@ -159,6 +166,22 @@ class Manager:
         task_log = await self.training_client.get_training_task_log(task_id)
         self.logger.info(task_log)
         return TaskLogResponse(task_id=task_id, logs=task_log)
+
+    async def get_inference_instance_list(self) -> list[InferenceInstanceInfo]:
+        instances = await self.inference_client.list_instances()
+        self.logger.info(instances)
+        self.inference_services = instances
+        return instances
+
+    async def get_inference_instance_log(self, instance_id: str) -> str:
+        log = await self.inference_client.get_instance_log(instance_id)
+        self.logger.info(log)
+        return log
+
+    async def generate(self, prompt: str) -> str:
+        response = await self.inference_client.generate(prompt)
+        response = response["text"][0] if isinstance(response, dict) and "text" in response else response
+        return response
 
 
 global_manager: Manager = Manager()

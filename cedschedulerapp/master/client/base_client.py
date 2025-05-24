@@ -29,3 +29,13 @@ class ClientBase:
         except requests.exceptions.RequestException as e:
             self.logger.error(f"Request to {url} failed: {e}")
             return None
+
+    async def get_request(self, endpoint: str) -> Optional[dict]:
+        url = f"{self.base_url}{endpoint}"
+        try:
+            response = requests.get(url)
+            response.raise_for_status()
+            return response.json()
+        except requests.exceptions.RequestException as e:
+            self.logger.error(f"Request to {url} failed: {e}")
+            return None

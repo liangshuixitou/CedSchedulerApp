@@ -1,6 +1,10 @@
 conda activate cedschedulerapp && \
-cd /root/project/CedSchedulerApp/cedschedulerapp/master && \
-python app.py --host 0.0.0.0 --port 12002 --training-host 10.31.12.20  --training-port 5000
+cd ~/project/CedSchedulerApp/cedschedulerapp/master && \
+python app.py --host 0.0.0.0 --port 5000 --training-host 10.31.12.20  --training-port 5000 --inference-host 10.212.70.38  --inference-port 37000
+
+conda activate cedschedulerapp && \
+cd ~/project/python-project/CedSchedulerApp/cedschedulerapp/master && \
+python app.py --host 0.0.0.0 --port 6000 --training-host 10.31.12.20  --training-port 5000 --inference-host 10.212.70.38  --inference-port 37000
 
 
 conda activate cedschedulerapp && \

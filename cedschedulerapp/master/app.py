@@ -1,10 +1,12 @@
 from fastapi import FastAPI
 
 from cedschedulerapp.master.args import server_config
+from cedschedulerapp.master.client.types import InferenceInstanceInfo
 from cedschedulerapp.master.enums import RegionType
 from cedschedulerapp.master.manager import global_manager
 from cedschedulerapp.master.schemas import APIResponse
 from cedschedulerapp.master.schemas import NodeResourceStats
+from cedschedulerapp.master.schemas import RequestSubmitRequest
 from cedschedulerapp.master.schemas import ResourceStats
 from cedschedulerapp.master.schemas import SubmitTaskRequest
 from cedschedulerapp.master.schemas import TaskLogResponse
@@ -73,6 +75,33 @@ async def update_task(task_id: str):
         return APIResponse(data=task_log)
     except Exception as e:
         return APIResponse(code=500, message=f"任务更新失败: {str(e)}")
+
+
+@app.get("/inference/instance_list", response_model=APIResponse[list[InferenceInstanceInfo]])
+async def get_inference_instance_list():
+    try:
+        instances = await global_manager.get_inference_instance_list()
+        return APIResponse(data=instances)
+    except Exception as e:
+        return APIResponse(code=500, message=f"获取推理实例列表失败: {str(e)}")
+
+
+@app.get("/inference/instance_log", response_model=APIResponse[str])
+async def get_inference_instance_log(instance_id: str):
+    try:
+        log = await global_manager.get_inference_instance_log(instance_id)
+        return APIResponse(data=log)
+    except Exception as e:
+        return APIResponse(code=500, message=f"获取推理实例日志失败: {str(e)}")
+
+
+@app.post("/inference/chat", response_model=APIResponse[str])
+async def chat(request: RequestSubmitRequest):
+    try:
+        response = await global_manager.generate(request.message)
+        return APIResponse(data=response)
+    except Exception as e:
+        return APIResponse(code=500, message=f"生成失败: {str(e)}")
 
 
 if __name__ == "__main__":
