@@ -5,10 +5,8 @@ from cedschedulerapp.master.client.client_type import InferenceInstanceInfo
 from cedschedulerapp.master.enums import RegionType
 from cedschedulerapp.master.manager import global_manager
 from cedschedulerapp.master.schemas import APIResponse
-from cedschedulerapp.master.schemas import BenchmarkProgressRequest
 from cedschedulerapp.master.schemas import BenchmarkProgressResponse
 from cedschedulerapp.master.schemas import BenchmarkRequest
-from cedschedulerapp.master.schemas import BenchmarkResultRequest
 from cedschedulerapp.master.schemas import BenchmarkResultResponse
 from cedschedulerapp.master.schemas import InferenceService
 from cedschedulerapp.master.schemas import NodeResourceStats
@@ -146,9 +144,9 @@ async def benchmark(request: BenchmarkRequest):
     "/inference/benchmark/progress",
     response_model=APIResponse[BenchmarkProgressResponse],
 )
-async def benchmark_progress(request: BenchmarkProgressRequest):
+async def benchmark_progress(benchmark_id: str, total: int, completed: int):
     try:
-        result = await global_manager.benchmark_progress(request)
+        result = await global_manager.benchmark_progress(benchmark_id, total, completed)
         return APIResponse(data=result)
     except Exception as e:
         return APIResponse(code=500, message=f"基准测试结果失败: {str(e)}")
@@ -157,9 +155,9 @@ async def benchmark_progress(request: BenchmarkProgressRequest):
 @app.get(
     "/inference/benchmark/result", response_model=APIResponse[BenchmarkResultResponse]
 )
-async def benchmark_result(request: BenchmarkResultRequest):
+async def benchmark_result(benchmark_id: str):
     try:
-        result = await global_manager.benchmark_result(request)
+        result = await global_manager.benchmark_result(benchmark_id)
         return APIResponse(data=result)
     except Exception as e:
         return APIResponse(code=500, message=f"基准测试结果失败: {str(e)}")

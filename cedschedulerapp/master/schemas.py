@@ -153,20 +153,9 @@ class BenchmarkRequest(BaseModel):
     qps: float
 
 
-class BenchmarkProgressRequest(BaseModel):
-    benchmark_id: str
-    total: int
-    completed: int
-
-
 class BenchmarkProgressResponse(BaseModel):
     total: int
     completed: int
-
-
-class BenchmarkResultRequest(BaseModel):
-    benchmark_id: str
-    total: int
 
 
 class BenchmarkResultResponse(BaseModel):

@@ -15,9 +15,7 @@ from cedschedulerapp.master.enums import GPUPerformance
 from cedschedulerapp.master.enums import GPUType
 from cedschedulerapp.master.enums import RegionType
 from cedschedulerapp.master.enums import TaskStatus
-from cedschedulerapp.master.schemas import BenchmarkProgressRequest
 from cedschedulerapp.master.schemas import BenchmarkProgressResponse
-from cedschedulerapp.master.schemas import BenchmarkResultRequest
 from cedschedulerapp.master.schemas import BenchmarkResultResponse
 from cedschedulerapp.master.schemas import InferenceService
 from cedschedulerapp.master.schemas import NodeResourceStats
@@ -245,22 +243,18 @@ class Manager:
         return benchmark_id
 
     async def benchmark_progress(
-        self, request: BenchmarkProgressRequest
+        self, benchmark_id: str, total: int, completed: int
     ) -> BenchmarkProgressResponse:
-        result = await self.inference_client.benchmark_result(request.benchmark_id)
+        result = await self.inference_client.benchmark_result(benchmark_id)
         progress = global_benchmark_parser.parse_progress(result)
         if progress is None:
-            return BenchmarkProgressResponse(
-                total=request.total, completed=request.completed
-            )
+            return BenchmarkProgressResponse(total=total, completed=completed)
         return BenchmarkProgressResponse(
             total=progress.total_prompts, completed=progress.current_progress
         )
 
-    async def benchmark_result(
-        self, request: BenchmarkResultRequest
-    ) -> BenchmarkResultResponse:
-        result = await self.inference_client.benchmark_result(request.benchmark_id)
+    async def benchmark_result(self, benchmark_id: str) -> BenchmarkResultResponse:
+        result = await self.inference_client.benchmark_result(benchmark_id)
         result = global_benchmark_parser.parse_result(result)
         if result is None:
             return BenchmarkResultResponse(
