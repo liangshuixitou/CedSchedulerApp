@@ -42,6 +42,10 @@ class Manager:
             ip=server_config.inference_host, port=server_config.inference_port
         )
         self.logger = setup_logger(__name__)
+
+        self.benchmark_ids = []
+        self.benchmark_ids_lock = Lock()
+
         self.get_training_task_list_daemon()
 
     def get_training_task_list_daemon(self):
@@ -240,6 +244,8 @@ class Manager:
         benchmark_id = await self.inference_client.benchmark(
             num_prompts=num_prompts, qps=qps
         )
+        async with self.benchmark_ids_lock:
+            self.benchmark_ids.append(benchmark_id)
         return benchmark_id
 
     async def benchmark_progress(
@@ -269,6 +275,13 @@ class Manager:
             end_to_end_latencies=result.e2e_latencies,
             prefill_latencies=result.decode_token_latencies,
         )
+
+    async def get_benchmark_result_list(self) -> list[BenchmarkResultResponse]:
+        async with self.benchmark_ids_lock:
+            return [
+                await self.benchmark_result(benchmark_id)
+                for benchmark_id in self.benchmark_ids
+            ]
 
 
 global_manager: Manager = Manager()

@@ -153,7 +153,7 @@ async def benchmark_progress(benchmark_id: str, total: int, completed: int):
 
 
 @app.get(
-    "/inference/benchmark/result", response_model=APIResponse[BenchmarkResultResponse]
+    "/inference/benchmark/results", response_model=APIResponse[BenchmarkResultResponse]
 )
 async def benchmark_result(benchmark_id: str):
     try:
