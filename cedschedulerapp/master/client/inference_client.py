@@ -11,10 +11,10 @@ class InferenceServerClient(ClientBase):
     async def list_instances(self) -> list[InferenceInstanceInfo]:
         """获取推理实例列表"""
         response = await self.get_request("/instance_list")
-        response = response.get("data", [])
         if response is None:
             return []
 
+        response = response.get("data", [])
         instances = []
         for instance_data in response:
             instance = InferenceInstanceInfo(
