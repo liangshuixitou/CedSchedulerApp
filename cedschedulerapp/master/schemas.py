@@ -4,9 +4,13 @@ from typing import TypeVar
 
 from pydantic import BaseModel
 
-from cedschedulerapp.master.client.types import InferenceInstanceInfo, ScheduleInfo, TaskWrapRuntimeInfo
-from cedschedulerapp.master.enums import NodeType, TaskInstStatus, TaskStatus
+from cedschedulerapp.master.client.types import InferenceInstanceInfo
+from cedschedulerapp.master.client.types import ScheduleInfo
+from cedschedulerapp.master.client.types import TaskWrapRuntimeInfo
+from cedschedulerapp.master.enums import NodeType
 from cedschedulerapp.master.enums import RegionType
+from cedschedulerapp.master.enums import TaskInstStatus
+from cedschedulerapp.master.enums import TaskStatus
 
 T = TypeVar("T")
 
@@ -117,10 +121,6 @@ class ResourceStats(BaseModel):
     used_memory_count: int
     total_storage_count: int
     used_storage_count: int
-    training_task_count: int
-    inference_service_count: int
-    training_tasks: list[TrainingTask]
-    inference_services: list[InferenceService]
 
 
 class SubmitTaskRequest(BaseModel):

@@ -88,11 +88,17 @@ class Manager:
                 used_storage_count=sum(node.used_storage_count for node in self.node_stats.values()),
                 training_task_count=len(self.training_tasks),
                 inference_service_count=len(self.inference_services),
-                training_tasks=[TrainingTask.from_training_task_detail(task) for task in self.training_tasks],
-                inference_services=[
-                    InferenceService.from_inference_instance_info(instance) for instance in self.inference_services
-                ],
             )
+
+    async def get_training_task_sim_list(self) -> list[TrainingTask]:
+        training_task_list = await self.get_training_task_list()
+        sim_list = [TrainingTask.from_training_task_detail(task) for task in training_task_list]
+        return sim_list
+
+    async def get_service_sim_list(self) -> list[InferenceService]:
+        service_list = await self.get_inference_instance_list()
+        sim_list = [InferenceService.from_inference_instance_info(service) for service in service_list]
+        return sim_list
 
     async def get_training_task_list(self) -> list[TrainingTaskDetail]:
         training_task_wrap_runtime_list = await self.training_client.list_tasks()
