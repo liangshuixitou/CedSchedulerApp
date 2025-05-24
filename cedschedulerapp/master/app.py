@@ -5,6 +5,7 @@ from cedschedulerapp.master.client.client_type import InferenceInstanceInfo
 from cedschedulerapp.master.enums import RegionType
 from cedschedulerapp.master.manager import global_manager
 from cedschedulerapp.master.schemas import APIResponse
+from cedschedulerapp.master.schemas import BenchmarkHistory
 from cedschedulerapp.master.schemas import BenchmarkProgressResponse
 from cedschedulerapp.master.schemas import BenchmarkRequest
 from cedschedulerapp.master.schemas import BenchmarkResultResponse
@@ -165,7 +166,7 @@ async def benchmark_result(benchmark_id: str):
 
 @app.get(
     "/inference/benchmark/results/list",
-    response_model=APIResponse[list[BenchmarkResultResponse]],
+    response_model=APIResponse[list[BenchmarkHistory]],
 )
 async def benchmark_result_list():
     try:

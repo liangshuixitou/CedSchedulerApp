@@ -163,3 +163,11 @@ class BenchmarkResultResponse(BaseModel):
     response_lens: list[int]
     end_to_end_latencies: list[float]
     prefill_latencies: list[float]
+
+
+class BenchmarkHistory(BaseModel):
+    benchmark_id: str
+    timestamp: float
+    qps: float
+    num_prompts: int
+    results: BenchmarkResultResponse

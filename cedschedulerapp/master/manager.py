@@ -15,6 +15,7 @@ from cedschedulerapp.master.enums import GPUPerformance
 from cedschedulerapp.master.enums import GPUType
 from cedschedulerapp.master.enums import RegionType
 from cedschedulerapp.master.enums import TaskStatus
+from cedschedulerapp.master.schemas import BenchmarkHistory
 from cedschedulerapp.master.schemas import BenchmarkProgressResponse
 from cedschedulerapp.master.schemas import BenchmarkResultResponse
 from cedschedulerapp.master.schemas import InferenceService
@@ -43,8 +44,8 @@ class Manager:
         )
         self.logger = setup_logger(__name__)
 
-        self.benchmark_ids = []
-        self.benchmark_ids_lock = Lock()
+        self.benchmark_history: list[BenchmarkHistory] = []
+        self.benchmark_history_lock = Lock()
 
         self.get_training_task_list_daemon()
 
@@ -244,8 +245,21 @@ class Manager:
         benchmark_id = await self.inference_client.benchmark(
             num_prompts=num_prompts, qps=qps
         )
-        async with self.benchmark_ids_lock:
-            self.benchmark_ids.append(benchmark_id)
+        async with self.benchmark_history_lock:
+            self.benchmark_history.append(
+                BenchmarkHistory(
+                    benchmark_id=benchmark_id,
+                    timestamp=time.time(),
+                    qps=qps,
+                    num_prompts=num_prompts,
+                    results=BenchmarkResultResponse(
+                        prompt_lens=[],
+                        response_lens=[],
+                        end_to_end_latencies=[],
+                        prefill_latencies=[],
+                    ),
+                )
+            )
         return benchmark_id
 
     async def benchmark_progress(
@@ -269,19 +283,20 @@ class Manager:
                 end_to_end_latencies=[],
                 prefill_latencies=[],
             )
-        return BenchmarkResultResponse(
+        benchmark_result = BenchmarkResultResponse(
             prompt_lens=result.prompt_lens,
             response_lens=result.response_lens,
             end_to_end_latencies=result.e2e_latencies,
             prefill_latencies=result.decode_token_latencies,
         )
 
-    async def get_benchmark_result_list(self) -> list[BenchmarkResultResponse]:
-        async with self.benchmark_ids_lock:
-            return [
-                await self.benchmark_result(benchmark_id)
-                for benchmark_id in self.benchmark_ids
-            ]
+        return benchmark_result
+
+    async def get_benchmark_result_list(self) -> list[BenchmarkHistory]:
+        async with self.benchmark_history_lock:
+            for history in self.benchmark_history:
+                history.results = await self.benchmark_result(history.benchmark_id)
+            return self.benchmark_history
 
 
 global_manager: Manager = Manager()
