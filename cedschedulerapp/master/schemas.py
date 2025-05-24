@@ -109,8 +109,8 @@ class InferenceService(BaseModel):
         return cls(
             instance_id=instance.instance_id,
             gpu_count=instance.gpu_count,
-            block_count=instance.block_count,
-            used_block_count=instance.used_block_count,
+            block_count=instance.total_gpu_blocks_count,
+            used_block_count=instance.used_gpu_blocks_count,
         )
 
 
