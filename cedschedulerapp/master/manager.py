@@ -86,8 +86,6 @@ class Manager:
                 used_memory_count=sum(node.used_memory_count for node in self.node_stats.values()),
                 total_storage_count=sum(node.storage_count for node in self.node_stats.values()),
                 used_storage_count=sum(node.used_storage_count for node in self.node_stats.values()),
-                training_task_count=len(self.training_tasks),
-                inference_service_count=len(self.inference_services),
             )
 
     async def get_training_task_sim_list(self) -> list[TrainingTask]:

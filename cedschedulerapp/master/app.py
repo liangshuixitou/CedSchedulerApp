@@ -5,6 +5,7 @@ from cedschedulerapp.master.client.types import InferenceInstanceInfo
 from cedschedulerapp.master.enums import RegionType
 from cedschedulerapp.master.manager import global_manager
 from cedschedulerapp.master.schemas import APIResponse
+from cedschedulerapp.master.schemas import InferenceService
 from cedschedulerapp.master.schemas import NodeResourceStats
 from cedschedulerapp.master.schemas import RequestSubmitRequest
 from cedschedulerapp.master.schemas import ResourceStats
@@ -49,8 +50,24 @@ async def get_nodes_stats(region: RegionType):
         return APIResponse(code=500, message=f"获取所有节点状态失败: {str(e)}")
 
 
-@app.get("/trainning/task_sim_list", response_class=APIResponse[list[TrainingTask]])
-@app.get("/trainning/task_sim_list", response_class=APIResponse[list[TrainingTask]])
+@app.get("/resources/task_sim_list", response_class=APIResponse[list[TrainingTask]])
+async def get_training_task_sim_list():
+    try:
+        stats = await global_manager.get_training_task_sim_list()
+        return APIResponse(data=stats)
+    except Exception as e:
+        return APIResponse(code=500, message=f"获取训练任务列表失败: {str(e)}")
+
+
+@app.get("/resources/service_sim_list", response_class=APIResponse[list[InferenceService]])
+async def get_inference_service_sim_list():
+    try:
+        stats = await global_manager.get_service_sim_list()
+        return APIResponse(data=stats)
+    except Exception as e:
+        return APIResponse(code=500, message=f"获取推理服务列表失败: {str(e)}")
+
+
 @app.get("/training/task_list", response_model=APIResponse[list[TrainingTaskDetail]])
 async def get_training_task_list():
     try:
