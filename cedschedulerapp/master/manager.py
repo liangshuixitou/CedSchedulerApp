@@ -179,7 +179,6 @@ class Manager:
 
     async def get_inference_instance_log(self, instance_id: str) -> str:
         log = await self.inference_client.get_instance_log(instance_id)
-        self.logger.info(log)
         return log
 
     async def generate(self, prompt: str) -> str:

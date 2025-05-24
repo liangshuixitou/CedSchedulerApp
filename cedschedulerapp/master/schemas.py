@@ -1,3 +1,4 @@
+import time
 from typing import Generic
 from typing import Optional
 from typing import TypeVar
@@ -85,10 +86,14 @@ class TrainingTask(BaseModel):
 
     @classmethod
     def from_training_task_detail(cls, task: TrainingTaskDetail):
+        if task.task_end_time < task.task_start_time:
+            duration = time.time() - task.task_start_time
+        else:
+            duration = task.task_end_time - task.task_start_time
         return cls(
             id=task.task_id,
             name=task.task_name,
-            duration=task.task_end_time - task.task_start_time,
+            duration=duration,
             status=task.task_status,
         )
 
