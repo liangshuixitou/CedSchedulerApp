@@ -1,10 +1,15 @@
 from fastapi import FastAPI
 
 from cedschedulerapp.master.args import server_config
-from cedschedulerapp.master.client.types import InferenceInstanceInfo
+from cedschedulerapp.master.client.client_type import InferenceInstanceInfo
 from cedschedulerapp.master.enums import RegionType
 from cedschedulerapp.master.manager import global_manager
 from cedschedulerapp.master.schemas import APIResponse
+from cedschedulerapp.master.schemas import BenchmarkProgressRequest
+from cedschedulerapp.master.schemas import BenchmarkProgressResponse
+from cedschedulerapp.master.schemas import BenchmarkRequest
+from cedschedulerapp.master.schemas import BenchmarkResultRequest
+from cedschedulerapp.master.schemas import BenchmarkResultResponse
 from cedschedulerapp.master.schemas import InferenceService
 from cedschedulerapp.master.schemas import NodeResourceStats
 from cedschedulerapp.master.schemas import RequestSubmitRequest
@@ -59,7 +64,9 @@ async def get_training_task_sim_list():
         return APIResponse(code=500, message=f"获取训练任务列表失败: {str(e)}")
 
 
-@app.get("/resources/service_sim_list", response_model=APIResponse[list[InferenceService]])
+@app.get(
+    "/resources/service_sim_list", response_model=APIResponse[list[InferenceService]]
+)
 async def get_inference_service_sim_list():
     try:
         stats = await global_manager.get_service_sim_list()
@@ -97,7 +104,9 @@ async def update_task(task_id: str):
         return APIResponse(code=500, message=f"任务更新失败: {str(e)}")
 
 
-@app.get("/inference/instance_list", response_model=APIResponse[list[InferenceInstanceInfo]])
+@app.get(
+    "/inference/instance_list", response_model=APIResponse[list[InferenceInstanceInfo]]
+)
 async def get_inference_instance_list():
     try:
         instances = await global_manager.get_inference_instance_list()
@@ -122,6 +131,38 @@ async def chat(request: RequestSubmitRequest):
         return APIResponse(data=response)
     except Exception as e:
         return APIResponse(code=500, message=f"生成失败: {str(e)}")
+
+
+@app.post("/inference/benchmark", response_model=APIResponse[str])
+async def benchmark(request: BenchmarkRequest):
+    try:
+        benchmark_id = await global_manager.benchmark(request.num_prompts, request.qps)
+        return APIResponse(data=benchmark_id)
+    except Exception as e:
+        return APIResponse(code=500, message=f"基准测试失败: {str(e)}")
+
+
+@app.get(
+    "/inference/benchmark/progress",
+    response_model=APIResponse[BenchmarkProgressResponse],
+)
+async def benchmark_progress(request: BenchmarkProgressRequest):
+    try:
+        result = await global_manager.benchmark_progress(request)
+        return APIResponse(data=result)
+    except Exception as e:
+        return APIResponse(code=500, message=f"基准测试结果失败: {str(e)}")
+
+
+@app.get(
+    "/inference/benchmark/result", response_model=APIResponse[BenchmarkResultResponse]
+)
+async def benchmark_result(request: BenchmarkResultRequest):
+    try:
+        result = await global_manager.benchmark_result(request)
+        return APIResponse(data=result)
+    except Exception as e:
+        return APIResponse(code=500, message=f"基准测试结果失败: {str(e)}")
 
 
 if __name__ == "__main__":

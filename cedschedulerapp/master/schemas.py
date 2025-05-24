@@ -5,9 +5,9 @@ from typing import TypeVar
 
 from pydantic import BaseModel
 
-from cedschedulerapp.master.client.types import InferenceInstanceInfo
-from cedschedulerapp.master.client.types import ScheduleInfo
-from cedschedulerapp.master.client.types import TaskWrapRuntimeInfo
+from cedschedulerapp.master.client.client_type import InferenceInstanceInfo
+from cedschedulerapp.master.client.client_type import ScheduleInfo
+from cedschedulerapp.master.client.client_type import TaskWrapRuntimeInfo
 from cedschedulerapp.master.enums import NodeType
 from cedschedulerapp.master.enums import RegionType
 from cedschedulerapp.master.enums import TaskInstStatus
@@ -146,3 +146,31 @@ class TaskLogResponse(BaseModel):
 
 class RequestSubmitRequest(BaseModel):
     message: str
+
+
+class BenchmarkRequest(BaseModel):
+    num_prompts: int
+    qps: float
+
+
+class BenchmarkProgressRequest(BaseModel):
+    benchmark_id: str
+    total: int
+    completed: int
+
+
+class BenchmarkProgressResponse(BaseModel):
+    total: int
+    completed: int
+
+
+class BenchmarkResultRequest(BaseModel):
+    benchmark_id: str
+    total: int
+
+
+class BenchmarkResultResponse(BaseModel):
+    prompt_lens: list[int]
+    response_lens: list[int]
+    end_to_end_latencies: list[float]
+    prefill_latencies: list[float]

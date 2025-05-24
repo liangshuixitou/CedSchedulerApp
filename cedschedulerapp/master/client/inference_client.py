@@ -1,5 +1,5 @@
 from cedschedulerapp.master.client.base_client import ClientBase
-from cedschedulerapp.master.client.types import InferenceInstanceInfo
+from cedschedulerapp.master.client.client_type import InferenceInstanceInfo
 from cedschedulerapp.utils.logger import setup_logger
 
 
@@ -32,9 +32,9 @@ class InferenceServerClient(ClientBase):
 
     async def get_instance_log(self, instance_id: str) -> str:
         response = await self.get_request(f"/instance_log/{instance_id}")
-        response = response.get("data", "")
         if response is None:
             return ""
+        response = response.get("data", "")
         return response
 
     async def generate(self, prompt: str) -> str:
@@ -46,8 +46,22 @@ class InferenceServerClient(ClientBase):
             return ""
         return response
 
-    async def benchmark(self, num_prompt: int, qps: float) -> str:
-        response = await self._make_request("/benchmark", {"num_prompt": num_prompt, "qps": qps})
+    async def benchmark(self, num_prompts: int, qps: float) -> str:
+        response = await self._make_request(
+            "/benchmark", {"num_prompts": num_prompts, "qps": qps}
+        )
         if response is None:
             return ""
+
+        response = response.get("data", "")
+        self.logger.info(response)
+        return response.get("benchmark_id", "")
+
+    async def benchmark_result(self, benchmark_id: str) -> str:
+        response = await self.get_request(f"/benchmark_result/{benchmark_id}")
+        if response is None:
+            return ""
+
+        response = response.get("data", "")
+        self.logger.info(response)
         return response

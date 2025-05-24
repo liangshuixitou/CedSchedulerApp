@@ -1,7 +1,7 @@
 from cedschedulerapp.master.client.base_client import ClientBase
-from cedschedulerapp.master.client.types import ManagerTaskSubmitModel
-from cedschedulerapp.master.client.types import TaskMeta
-from cedschedulerapp.master.client.types import TaskMetaModel
+from cedschedulerapp.master.client.client_type import ManagerTaskSubmitModel
+from cedschedulerapp.master.client.client_type import TaskMeta
+from cedschedulerapp.master.client.client_type import TaskMetaModel
 from cedschedulerapp.utils.logger import setup_logger
 
 
