@@ -163,6 +163,18 @@ async def benchmark_result(benchmark_id: str):
         return APIResponse(code=500, message=f"基准测试结果失败: {str(e)}")
 
 
+@app.get(
+    "/inference/benchmark/results/list",
+    response_model=APIResponse[list[BenchmarkResultResponse]],
+)
+async def benchmark_result_list():
+    try:
+        result = await global_manager.get_benchmark_result_list()
+        return APIResponse(data=result)
+    except Exception as e:
+        return APIResponse(code=500, message=f"基准测试结果列表失败: {str(e)}")
+
+
 if __name__ == "__main__":
     import uvicorn
 
